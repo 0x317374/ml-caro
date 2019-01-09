@@ -5,8 +5,8 @@ from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-# from policy_value_net_pytorch import PolicyValueNet  # Pytorch
-from policy_value_net_tensorflow import PolicyValueNet  # Tensorflow
+from policy_value_net_pytorch import PolicyValueNet  # Pytorch
+# from policy_value_net_tensorflow import PolicyValueNet  # Tensorflow
 from const import Const
 import os
 
@@ -133,12 +133,13 @@ class TrainPipeline:
               self.pure_mcts_playout_num += 1000
               self.best_win_ratio = 0.0
     except KeyboardInterrupt:
+      self.policy_value_net.save_model("./current_{}x{}_{}.model".format(self.board_width, self.board_height, self.n_in_row))
       print("---\nQuit....")
 
 
 if __name__=="__main__":
   init_model = None
-  model_name = "./best_{}x{}_{}.model".format(Const.board_width, Const.board_height, Const.n_in_row)
+  model_name = "./current_{}x{}_{}.model".format(Const.board_width, Const.board_height, Const.n_in_row)
   if os.path.isfile(model_name):
     init_model = model_name
   print("init_model:", init_model)
