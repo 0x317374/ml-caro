@@ -4,6 +4,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+from const import Const
 
 
 def set_learning_rate(optimizer, lr):
@@ -51,9 +52,9 @@ class Net(nn.Module):
 class PolicyValueNet:
   """policy-value network """
 
-  def __init__(self, board_width, board_height, model_file = None, use_gpu = True):
-    print('use_gpu:', use_gpu)
-    self.use_gpu = use_gpu
+  def __init__(self, board_width, board_height, model_file = None):
+    print('use_gpu:', Const.use_gpu)
+    self.use_gpu = Const.use_gpu
     self.board_width = board_width
     self.board_height = board_height
     self.l2_const = 1e-4  # coef of l2 penalty

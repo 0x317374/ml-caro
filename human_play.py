@@ -4,6 +4,7 @@ from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
 from policy_value_net_pytorch import PolicyValueNet
+from const import Const
 
 
 class Human(object):
@@ -22,7 +23,7 @@ class Human(object):
     except Exception as e:
       move = -1
     if move==-1 or move not in board.availables:
-      print("invalid move")
+      print("Invalid move")
       move = self.get_action(board)
     return move
 
@@ -31,9 +32,9 @@ class Human(object):
 
 
 def run():
-  n = 3
-  width, height = 3, 3
-  model_file = 'best.model'
+  n = Const.n_in_row
+  width, height = Const.board_width, Const.board_height
+  model_file = "./best_{}x{}_{}.model".format(width, height, n)
   try:
     board = Board(width = width, height = height, n_in_row = n)
     game = Game(board)
@@ -44,8 +45,8 @@ def run():
     # set start_player=0 for human first
     game.start_play(human, mcts_player, start_player = 1, is_shown = 1)
   except KeyboardInterrupt:
-    print('\n\rquit')
+    print("---\nQuit....")
 
 
-if __name__=='__main__':
+if __name__=="__main__":
   run()
