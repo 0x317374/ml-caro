@@ -3,8 +3,12 @@ import pickle
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from policy_value_net_pytorch import PolicyValueNet
 from const import Const
+
+if Const.train_core=="tensorflow":
+  from policy_value_net_tensorflow import PolicyValueNet
+elif Const.train_core=="pytorch":
+  from policy_value_net_pytorch import PolicyValueNet
 
 
 class Human(object):
@@ -34,7 +38,7 @@ class Human(object):
 def run():
   n = Const.n_in_row
   width, height = Const.board_width, Const.board_height
-  model_file = "./best_{}x{}_{}.model".format(width, height, n)
+  model_file = "./models/{}_best_{}x{}_{}.model".format(Const.train_core, width, height, n)
   try:
     board = Board(width = width, height = height, n_in_row = n)
     game = Game(board)
