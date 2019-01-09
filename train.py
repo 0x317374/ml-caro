@@ -5,7 +5,8 @@ from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from policy_value_net_pytorch import PolicyValueNet  # Pytorch
+# from policy_value_net_pytorch import PolicyValueNet  # Pytorch
+from policy_value_net_tensorflow import PolicyValueNet  # Tensorflow
 from const import Const
 import os
 
