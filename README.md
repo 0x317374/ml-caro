@@ -8,7 +8,7 @@
 
 - `python train.py`
 
-### conda thiết lập python 3.6
+### Conda thiết lập python 3.6
 
 - Tạo env mới `conda create -n py3.68 python=3.6.8`
 
@@ -27,7 +27,7 @@
 
 !mkdir projects
 
-### test
+### Play game
 
 - `python human_play.py`
 
