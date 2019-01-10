@@ -8,6 +8,7 @@ from mcts_alphaZero import MCTSPlayer
 from const import Const
 import os
 import time
+import pathlib
 
 if Const.train_core=="tensorflow":
   from policy_value_net_tensorflow import PolicyValueNet
@@ -127,24 +128,25 @@ class TrainPipeline:
         if (i+1)%self.check_freq==0:
           print("Current self-play batch: {}".format(i+1))
           win_ratio = self.policy_evaluate()
-          self.policy_value_net.save_model("./models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+          self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
           if win_ratio>self.best_win_ratio:
             print("New best policy!!!!!!!!")
             self.best_win_ratio = win_ratio
             # update the best_policy
-            self.policy_value_net.save_model("./models/{}_best_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+            self.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
             if self.best_win_ratio==1.0 and self.pure_mcts_playout_num<5000:
               self.pure_mcts_playout_num += 1000
               self.best_win_ratio = 0.0
     except KeyboardInterrupt:
-      self.policy_value_net.save_model("./models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+      self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
       print("---\nQuit....")
       time.sleep(2)
 
 
 if __name__=="__main__":
+  pathlib.Path('./drive/models').mkdir(parents = True, exist_ok = True)
   init_model = None
-  model_name = "./models/{}_current_{}x{}_{}.model".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row)
+  model_name = "./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row)
   if os.path.isfile(model_name):
     init_model = model_name
   print("init_model:", init_model)

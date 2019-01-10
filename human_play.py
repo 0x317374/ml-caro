@@ -38,7 +38,7 @@ class Human(object):
 def run():
   n = Const.n_in_row
   width, height = Const.board_width, Const.board_height
-  model_file = "./models/{}_best_{}x{}_{}.model".format(Const.train_core, width, height, n)
+  model_file = "./drive/models/{}_best_{}x{}_{}.model".format(Const.train_core, width, height, n)
   try:
     board = Board(width = width, height = height, n_in_row = n)
     game = Game(board)
