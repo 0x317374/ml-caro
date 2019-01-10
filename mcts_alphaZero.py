@@ -120,7 +120,6 @@ class MCTS(object):
         leaf_value = 0.0
       else:
         leaf_value = (1.0 if winner==state.get_current_player() else -1.0)
-
     # Update value and visit count of nodes in this traversal.
     node.update_recursive(-leaf_value)
 
@@ -140,8 +139,8 @@ class MCTS(object):
     return acts, act_probs
 
   def update_with_move(self, last_move):
-    """Step forward in the tree, keeping everything we already know
-    about the subtree.
+    """
+    Step forward in the tree, keeping everything we already know about the subtree.
     """
     if last_move in self._root._children:
       self._root = self._root._children[last_move]
@@ -186,7 +185,6 @@ class MCTSPlayer(object):
         self.mcts.update_with_move(-1)
       # location = board.move_to_location(move)
       # print("AI move: %d,%d\n" % (location[0], location[1]))
-
       if return_prob:
         return move, move_probs
       else:
