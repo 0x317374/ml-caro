@@ -8,6 +8,10 @@
 
 - `python train.py`
 
+### Keras (python <=3.6)
+
+- `pip install keras`
+
 ### Conda thiết lập python 3.6
 
 - Tạo env mới `conda create -n py3.68 python=3.6.8`
@@ -17,7 +21,7 @@
 ### Google colab python 3 GPU
 
 ```
-!pip3 install torch torchvision
+!pip install keras
 !mkdir projects
 !cd projects && mkdir caro
 ```

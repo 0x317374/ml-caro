@@ -9,7 +9,6 @@ from const import Const
 import os
 import time
 import pathlib
-# from policy_value_net_pytorch import PolicyValueNet
 from policy_value_net_keras import PolicyValueNet
 
 

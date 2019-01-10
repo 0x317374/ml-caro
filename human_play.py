@@ -38,8 +38,13 @@ def run():
   try:
     board = Board(width = width, height = height, n_in_row = n)
     game = Game(board)
-    best_policy = PolicyValueNet(width, height, model_file = model_file)
-    mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct = 5, n_playout = 400)
+    # load the provided model (trained in Theano/Lasagne) into a MCTS player written in pure numpy
+    try:
+      policy_param = pickle.load(open(model_file, 'rb'))
+    except:
+      policy_param = pickle.load(open(model_file, 'rb'), encoding = 'bytes')  # To support python3
+    best_policy = PolicyValueNetNumpy(width, height, policy_param)
+    mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct = 5, n_playout = 400)  # set larger n_playout for better performance
     # human player, input your move in the format: 2,3
     human = Human()
     # set start_player=0 for human first
