@@ -198,10 +198,12 @@ class Game(object):
       current_players.append(self.board.current_player)
       # perform a move
       self.board.do_move(move)
-      if is_shown:
-        self.mini_graphic(self.board, p1, p2)
+      # if is_shown:
+      #   self.mini_graphic(self.board, p1, p2)
       end, winner = self.board.game_end()
       if end:
+        if is_shown:
+          self.mini_graphic(self.board, p1, p2)
         # winner from the perspective of the current player of each state
         winners_z = np.zeros(len(current_players))
         if winner!=-1:
