@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+import time
 
 
 class Board(object):
@@ -115,13 +116,14 @@ class Game(object):
   def __init__(self, board, **kwargs):
     self.board = board
 
-  def graphic(self, board, player1, player2):
+  def graphic(self, board, player1, player2, show_label = 1):
     """Draw the board and show game info"""
     width = board.width
     height = board.height
-    print("Player", player1, "with X".rjust(3))
-    print("Player", player2, "with O".rjust(3))
-    print()
+    if show_label:
+      print("Player", player1, "with X".rjust(3))
+      print("Player", player2, "with O".rjust(3))
+      print()
     for x in range(width):
       print("{0:8}".format(x), end = '')
     print('\r\n')
@@ -135,8 +137,25 @@ class Game(object):
         elif p==player2:
           print('O'.center(8), end = '')
         else:
-          print('_'.center(8), end = '')
-      print('\r\n\r\n')
+          print('-'.center(8), end = '')
+      print('\r\n')
+
+  def mini_graphic(self, board, player1, player2):
+    """Draw the board and show game info"""
+    width = board.width
+    height = board.height
+    for i in range(height-1, -1, -1):
+      for j in range(width):
+        loc = i*width+j
+        p = board.states.get(loc, -1)
+        if p==player1:
+          print('X'.center(2), end = '')
+        elif p==player2:
+          print('O'.center(2), end = '')
+        else:
+          print('-'.center(2), end = '')
+      print()
+    print()
 
   def start_play(self, player1, player2, start_player = 0, is_shown = 1):
     """start a game between two players"""
@@ -160,9 +179,9 @@ class Game(object):
       if end:
         if is_shown:
           if winner!=-1:
-            print("Game end. Winner is", players[winner])
+            print("- Game end. Winner is", players[winner])
           else:
-            print("Game end. Tie")
+            print("- Game end. Tie")
         return winner
 
   def start_self_play(self, player, is_shown = 0, temp = 1e-3):
@@ -170,6 +189,7 @@ class Game(object):
     self.board.init_board()
     p1, p2 = self.board.players
     states, mcts_probs, current_players = [], [], []
+    start_time = time.time()
     while True:
       move, move_probs = player.get_action(self.board, temp = temp, return_prob = 1)
       # store the data
@@ -179,7 +199,7 @@ class Game(object):
       # perform a move
       self.board.do_move(move)
       if is_shown:
-        self.graphic(self.board, p1, p2)
+        self.mini_graphic(self.board, p1, p2)
       end, winner = self.board.game_end()
       if end:
         # winner from the perspective of the current player of each state
@@ -191,7 +211,8 @@ class Game(object):
         player.reset_player()
         if is_shown:
           if winner!=-1:
-            print("Game end. Winner is player:", winner)
+            print("- Game end. Winner is player:", winner)
           else:
-            print("Game end. Tie")
+            print("- Game end. Tie")
+        print("- self play {} seconds".format(time.time()-start_time))
         return winner, zip(states, mcts_probs, winners_z)

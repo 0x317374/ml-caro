@@ -67,7 +67,7 @@ class TrainPipeline:
   def collect_selfplay_data(self, n_games = 1):
     """collect self-play data for training"""
     for i in range(n_games):
-      winner, play_data = self.game.start_self_play(self.mcts_player, temp = self.temp)
+      winner, play_data = self.game.start_self_play(self.mcts_player, temp = self.temp, is_shown = 1)
       play_data = list(play_data)[:]
       self.episode_len = len(play_data)
       # augment the data
@@ -117,7 +117,7 @@ class TrainPipeline:
     try:
       train_start = time.time()
       for i in range(self.game_batch_num):
-        print("Batch {}...".format(i+1))
+        print("---\nBatch {}...".format(i+1))
         self.collect_selfplay_data(self.play_batch_size)
         print("- episode_len: {}".format(self.episode_len))
         if len(self.data_buffer)>self.batch_size:
