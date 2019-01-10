@@ -32,7 +32,6 @@ class TrainPipeline:
     self.play_batch_size = 1
     self.epochs = 5  # num of train_steps for each update
     self.kl_targ = 0.02
-    self.check_freq = Const.check_freq
     self.game_batch_num = 1500
     self.best_win_ratio = 0.0
     # num of simulations used for the pure mcts, which is used as
@@ -123,10 +122,13 @@ class TrainPipeline:
         if len(self.data_buffer)>self.batch_size:
           loss, entropy = self.policy_update()
         # check the performance of the current model, and save the model params
-        if (i+1)%self.check_freq==0:
+        is_check_freq = (i+1)%Const.check_freq==0
+        is_check_freq_best = (i+1)%Const.check_freq_best==0
+        if is_check_freq:
           print("- Current self-play batch: {}".format(i+1))
-          win_ratio = self.policy_evaluate()
           self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+        if is_check_freq_best:
+          win_ratio = self.policy_evaluate()
           if win_ratio>self.best_win_ratio:
             print("- New best policy!!!!!!!!")
             self.best_win_ratio = win_ratio
