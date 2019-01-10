@@ -126,14 +126,14 @@ class TrainPipeline:
         is_check_freq_best = (i+1)%Const.check_freq_best==0
         if is_check_freq:
           print("- Current self-play batch: {}".format(i+1))
-          self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+          self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row, time.strftime("%Y%m%d%H%M")))
         if is_check_freq_best:
           win_ratio = self.policy_evaluate()
           if win_ratio>self.best_win_ratio:
             print("- New best policy!!!!!!!!")
             self.best_win_ratio = win_ratio
             # update the best_policy
-            self.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
+            self.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row, time.strftime("%Y%m%d%H%M")))
             if self.best_win_ratio==1.0 and self.pure_mcts_playout_num<5000:
               self.pure_mcts_playout_num += 1000
               self.best_win_ratio = 0.0
@@ -146,6 +146,7 @@ class TrainPipeline:
 
 if __name__=="__main__":
   pathlib.Path('./drive/models').mkdir(parents = True, exist_ok = True)
+  print(time.strftime("%Y-%m-%d %H:%M"))
   init_model = None
   model_name = "./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row)
   if os.path.isfile(model_name):
