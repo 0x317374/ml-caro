@@ -119,7 +119,7 @@ class TrainPipeline:
       for i in range(self.game_batch_num):
         print("Batch {}...".format(i+1))
         self.collect_selfplay_data(self.play_batch_size)
-        print("- episode_len: {}".format(i+1, self.episode_len))
+        print("- episode_len: {}".format(self.episode_len))
         if len(self.data_buffer)>self.batch_size:
           loss, entropy = self.policy_update()
         # check the performance of the current model, and save the model params
