@@ -4,11 +4,7 @@ from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
 from const import Const
-
-if Const.train_core=="tensorflow":
-  from policy_value_net_tensorflow import PolicyValueNet
-elif Const.train_core=="pytorch":
-  from policy_value_net_pytorch import PolicyValueNet
+from policy_value_net_pytorch import PolicyValueNet
 
 
 class Human(object):

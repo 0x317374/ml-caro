@@ -9,11 +9,7 @@ from const import Const
 import os
 import time
 import pathlib
-
-if Const.train_core=="tensorflow":
-  from policy_value_net_tensorflow import PolicyValueNet
-elif Const.train_core=="pytorch":
-  from policy_value_net_pytorch import PolicyValueNet
+from policy_value_net_pytorch import PolicyValueNet
 
 
 class TrainPipeline:
@@ -98,7 +94,7 @@ class TrainPipeline:
       self.lr_multiplier *= 1.5
     explained_var_old = (1-np.var(np.array(winner_batch)-old_v.flatten())/np.var(np.array(winner_batch)))
     explained_var_new = (1-np.var(np.array(winner_batch)-new_v.flatten())/np.var(np.array(winner_batch)))
-    print("kl: {:.5f}, lr_multiplier: {:.3f}, loss: {}, entropy: {}, explained_var_old: {:.3f}, explained_var_new: {:.3f}".format(kl, self.lr_multiplier, loss, entropy, explained_var_old, explained_var_new))
+    print("- kl: {:.5f}, lr_multiplier: {:.3f}, loss: {}, entropy: {}, explained_var_old: {:.3f}, explained_var_new: {:.3f}".format(kl, self.lr_multiplier, loss, entropy, explained_var_old, explained_var_new))
     return loss, entropy
 
   def policy_evaluate(self, n_games = 10):
@@ -113,32 +109,35 @@ class TrainPipeline:
       winner = self.game.start_play(current_mcts_player, pure_mcts_player, start_player = i%2, is_shown = 0)
       win_cnt[winner] += 1
     win_ratio = 1.0*(win_cnt[1]+0.5*win_cnt[-1])/n_games
-    print("num_playouts: {}, win: {}, lose: {}, tie: {}".format(self.pure_mcts_playout_num, win_cnt[1], win_cnt[2], win_cnt[-1]))
+    print("- num_playouts: {}, win: {}, lose: {}, tie: {}".format(self.pure_mcts_playout_num, win_cnt[1], win_cnt[2], win_cnt[-1]))
     return win_ratio
 
   def run(self):
     """run the training pipeline"""
     try:
+      train_start = time.time()
       for i in range(self.game_batch_num):
+        print("Batch {}...".format(i+1))
         self.collect_selfplay_data(self.play_batch_size)
-        print("Batch i: {}, episode_len: {}".format(i+1, self.episode_len))
+        print("- episode_len: {}".format(i+1, self.episode_len))
         if len(self.data_buffer)>self.batch_size:
           loss, entropy = self.policy_update()
         # check the performance of the current model, and save the model params
         if (i+1)%self.check_freq==0:
-          print("Current self-play batch: {}".format(i+1))
+          print("- Current self-play batch: {}".format(i+1))
           win_ratio = self.policy_evaluate()
           self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
           if win_ratio>self.best_win_ratio:
-            print("New best policy!!!!!!!!")
+            print("- New best policy!!!!!!!!")
             self.best_win_ratio = win_ratio
             # update the best_policy
             self.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
             if self.best_win_ratio==1.0 and self.pure_mcts_playout_num<5000:
               self.pure_mcts_playout_num += 1000
               self.best_win_ratio = 0.0
+        print("- done {} seconds!".format(time.time()-train_start))
+        train_start = time.time()
     except KeyboardInterrupt:
-      self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row))
       print("---\nQuit....")
       time.sleep(2)
 
