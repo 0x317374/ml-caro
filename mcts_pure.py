@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 A pure implementation of the Monte Carlo Tree Search (MCTS)
-
-@author: Junxiao Song
 """
 
 import numpy as np
@@ -96,13 +94,8 @@ class MCTS(object):
 
   def __init__(self, policy_value_fn, c_puct = 5, n_playout = 10000):
     """
-    policy_value_fn: a function that takes in a board state and outputs
-        a list of (action, probability) tuples and also a score in [-1, 1]
-        (i.e. the expected value of the end game score from the current
-        player's perspective) for the current player.
-    c_puct: a number in (0, inf) that controls how quickly exploration
-        converges to the maximum-value policy. A higher value means
-        relying on the prior more.
+    policy_value_fn: a function that takes in a board state and outputs a list of (action, probability) tuples and also a score in [-1, 1] (i.e. the expected value of the end game score from the current player's perspective) for the current player.
+    c_puct: a number in (0, inf) that controls how quickly exploration converges to the maximum-value policy. A higher value means relying on the prior more.
     """
     self._root = TreeNode(None, 1.0)
     self._policy = policy_value_fn
@@ -110,8 +103,8 @@ class MCTS(object):
     self._n_playout = n_playout
 
   def _playout(self, state):
-    """Run a single playout from the root to the leaf, getting a value at
-    the leaf and propagating it back through its parents.
+    """
+    Run a single playout from the root to the leaf, getting a value at the leaf and propagating it back through its parents.
     State is modified in-place, so a copy must be provided.
     """
     node = self._root
@@ -132,9 +125,8 @@ class MCTS(object):
     node.update_recursive(-leaf_value)
 
   def _evaluate_rollout(self, state, limit = 1000):
-    """Use the rollout policy to play until the end of the game,
-    returning +1 if the current player wins, -1 if the opponent wins,
-    and 0 if it is a tie.
+    """
+    Use the rollout policy to play until the end of the game, returning +1 if the current player wins, -1 if the opponent wins, and 0 if it is a tie.
     """
     player = state.get_current_player()
     for i in range(limit):
@@ -153,9 +145,9 @@ class MCTS(object):
       return 1 if winner==player else -1
 
   def get_move(self, state):
-    """Runs all playouts sequentially and returns the most visited action.
+    """
+    Runs all playouts sequentially and returns the most visited action.
     state: the current game state
-
     Return: the selected action
     """
     for n in range(self._n_playout):
