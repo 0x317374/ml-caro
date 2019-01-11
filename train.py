@@ -10,6 +10,8 @@ import os
 import time
 import pathlib
 from policy_value_net_keras import PolicyValueNet
+import pickle
+import shutil
 
 
 class TrainPipeline:
@@ -32,7 +34,7 @@ class TrainPipeline:
     self.play_batch_size = 1
     self.epochs = 5  # num of train_steps for each update
     self.kl_targ = 0.02
-    self.game_batch_num = 1500
+    self.game_batch_num = 1000000
     self.best_win_ratio = 0.0
     # num of simulations used for the pure mcts, which is used as
     # the opponent to evaluate the trained policy
@@ -44,6 +46,7 @@ class TrainPipeline:
       # start training from a new policy-value net
       self.policy_value_net = PolicyValueNet(self.board_width, self.board_height)
     self.mcts_player = MCTSPlayer(self.policy_value_net.policy_value_fn, c_puct = self.c_puct, n_playout = self.n_playout, is_selfplay = 1)
+    self.batch = 0
 
   def get_equi_data(self, play_data):
     """
@@ -111,46 +114,80 @@ class TrainPipeline:
     print("- num_playouts: {}, win: {}, lose: {}, tie: {}".format(self.pure_mcts_playout_num, win_cnt[1], win_cnt[2], win_cnt[-1]))
     return win_ratio
 
-  def run(self):
-    """run the training pipeline"""
-    try:
+
+def run(training_pipeline):
+  """run the training pipeline"""
+  try:
+    train_start = time.time()
+    for i in range(training_pipeline.batch, training_pipeline.game_batch_num):
+      print("---\nBatch {}...".format(i+1))
+      training_pipeline.collect_selfplay_data(training_pipeline.play_batch_size)
+      print("- episode_len: {}".format(training_pipeline.episode_len))
+      if len(training_pipeline.data_buffer)>training_pipeline.batch_size:
+        loss, entropy = training_pipeline.policy_update()
+        print("- loss: {}, entropy: {}".format(loss, entropy))
+      # check the performance of the current model, and save the model params
+      is_check_freq = (i+1)%Const.check_freq==0
+      is_check_freq_best = (i+1)%Const.check_freq_best==0
+      if is_check_freq:
+        print("- Current self-play batch: {}".format(i+1))
+        model_file = "./drive/models/{}_current_{}x{}_{}_{}.model".format(Const.train_core, training_pipeline.board_width, training_pipeline.board_height, training_pipeline.n_in_row, time.strftime("%Y-%m-%d_%H-%M"))
+        training_pipeline.policy_value_net.save_model(model_file)
+        shutil.copy2(model_file, "./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row))
+        # save state
+        save_state(training_pipeline)
+      if is_check_freq_best:
+        win_ratio = training_pipeline.policy_evaluate()
+        if win_ratio>training_pipeline.best_win_ratio:
+          print("- New best policy!!!!!!!!")
+          training_pipeline.best_win_ratio = win_ratio
+          # update the best_policy
+          training_pipeline.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}_{}.model".format(Const.train_core, training_pipeline.board_width, training_pipeline.board_height, training_pipeline.n_in_row, time.strftime("%Y-%m-%d_%H-%M")))
+          if training_pipeline.best_win_ratio==1.0 and training_pipeline.pure_mcts_playout_num<5000:
+            training_pipeline.pure_mcts_playout_num += 1000
+            training_pipeline.best_win_ratio = 0.0
+      print("- done {} seconds!".format(time.time()-train_start))
       train_start = time.time()
-      for i in range(self.game_batch_num):
-        print("---\nBatch {}...".format(i+1))
-        self.collect_selfplay_data(self.play_batch_size)
-        print("- episode_len: {}".format(self.episode_len))
-        if len(self.data_buffer)>self.batch_size:
-          loss, entropy = self.policy_update()
-        # check the performance of the current model, and save the model params
-        is_check_freq = (i+1)%Const.check_freq==0
-        is_check_freq_best = (i+1)%Const.check_freq_best==0
-        if is_check_freq:
-          print("- Current self-play batch: {}".format(i+1))
-          self.policy_value_net.save_model("./drive/models/{}_current_{}x{}_{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row, time.strftime("%Y-%m-%d_%H-%M")))
-        if is_check_freq_best:
-          win_ratio = self.policy_evaluate()
-          if win_ratio>self.best_win_ratio:
-            print("- New best policy!!!!!!!!")
-            self.best_win_ratio = win_ratio
-            # update the best_policy
-            self.policy_value_net.save_model("./drive/models/{}_best_{}x{}_{}_{}.model".format(Const.train_core, self.board_width, self.board_height, self.n_in_row, time.strftime("%Y-%m-%d_%H-%M")))
-            if self.best_win_ratio==1.0 and self.pure_mcts_playout_num<5000:
-              self.pure_mcts_playout_num += 1000
-              self.best_win_ratio = 0.0
-        print("- done {} seconds!".format(time.time()-train_start))
-        train_start = time.time()
-    except KeyboardInterrupt:
-      print("---\nQuit....")
-      time.sleep(2)
+      training_pipeline.batch = i
+  except KeyboardInterrupt:
+    print("---\nQuit....")
+    time.sleep(2)
 
 
-if __name__=="__main__":
-  pathlib.Path('./drive/models').mkdir(parents = True, exist_ok = True)
-  print(time.strftime("%Y-%m-%d %H:%M"))
+def save_state(training_pipeline):
+  start_save = time.time()
+  _policy = training_pipeline.mcts_player.mcts._policy
+  policy_value_net = training_pipeline.policy_value_net
+  training_pipeline.mcts_player.mcts._policy = None
+  training_pipeline.policy_value_net = None
+  pickle.dump(training_pipeline, open("./drive/others/{}_training_pipeline_{}x{}_{}.p".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row), "wb"))
+  training_pipeline.mcts_player.mcts._policy = _policy
+  training_pipeline.policy_value_net = policy_value_net
+  print("- save state {} seconds".format(time.time()-start_save))
+
+
+def load_state():
   init_model = None
   model_name = "./drive/models/{}_current_{}x{}_{}.model".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row)
   if os.path.isfile(model_name):
     init_model = model_name
   print("init_model:", init_model)
-  training_pipeline = TrainPipeline(init_model = init_model)
-  training_pipeline.run()
+  state_file = "./drive/others/{}_training_pipeline_{}x{}_{}.p".format(Const.train_core, Const.board_width, Const.board_height, Const.n_in_row)
+  if os.path.isfile(state_file):
+    training_pipeline = pickle.load(open(state_file, "rb"))
+    # training_pipeline.policy_value_net =
+    if init_model:
+      training_pipeline.policy_value_net = PolicyValueNet(training_pipeline.board_width, training_pipeline.board_height, model_file = init_model)
+    else:
+      training_pipeline.policy_value_net = PolicyValueNet(training_pipeline.board_width, training_pipeline.board_height)
+    training_pipeline.mcts_player.mcts._policy = training_pipeline.policy_value_net.policy_value_fn
+    return training_pipeline
+  return TrainPipeline(init_model = init_model)
+
+
+if __name__=="__main__":
+  pathlib.Path('./drive/models').mkdir(parents = True, exist_ok = True)
+  pathlib.Path('./drive/others').mkdir(parents = True, exist_ok = True)
+  print(time.strftime("%Y-%m-%d %H:%M"))
+  training_pipeline = load_state()
+  run(training_pipeline)
