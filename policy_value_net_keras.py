@@ -16,7 +16,7 @@ import numpy as np
 import pickle
 
 
-class PolicyValueNet():
+class PolicyValueNet:
   """policy-value network """
 
   def __init__(self, board_width, board_height, model_file = None):
