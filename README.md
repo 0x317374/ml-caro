@@ -2,7 +2,7 @@
 
 ### Local
 ```
-git clone git@github.com:dccxx/pip.git -b alpha-zero-general alpha-zero-general
+git clone git@github.com:dccxx/pip.git --depth=1 -b board_game_base board_game_base && rm -rf board_game_base/.git
 pip install keras
 ```
 
@@ -32,7 +32,4 @@ vcode = getpass.getpass()
 ```
 !git clone git@github.com:dccxx/pip.git -b alpha-zero-general alpha-zero-general
 !pip install keras
-```
-```
-!python main.py
 ```
