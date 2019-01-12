@@ -2,7 +2,7 @@
 
 ### Local
 ```
-git clone git@github.com:dccxx/pip.git --depth=1 -b board_game_base board_game_base && rm -rf board_game_base/.git
+git clone https://github.com/dccxx/pip.git --depth=1 -b board_game_base board_game_base && rm -rf board_game_base/.git
 pip install keras
 ```
 
