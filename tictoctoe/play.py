@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append('..')
 from board_game_base.arena import Arena as arena
 from board_game_base.mcts import MCTS
 from tictoctoe.game import TicTacToeGame, display

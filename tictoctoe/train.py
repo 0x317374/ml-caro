@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append('..')
 from board_game_base.coach import Coach
 from tictoctoe.game import TicTacToeGame as Game
 from tictoctoe.nnet_base import NNetWrapper as nn
