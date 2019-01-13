@@ -1,0 +1,14 @@
+{
+  "name": "auto-google-colab",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "puppeteer": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "@types/puppeteer": "^1.11.1"
+  }
+}
