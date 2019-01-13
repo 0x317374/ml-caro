@@ -13,7 +13,9 @@ const CONF = {
 !apt-get update -qq 2>&1 > /dev/null
 !apt-get -y install -qq google-drive-ocamlfuse fuse`.trim(), `
 from google.colab import auth
+import time
 auth.authenticate_user()
+time.sleep(2)
 `.trim(), `
 from oauth2client.client import GoogleCredentials
 creds = GoogleCredentials.get_application_default()
@@ -109,6 +111,8 @@ let reset_all_runtimes = async (page) => {
 }
 
 const TASK = async (browser) => {
+  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 5)
+
   let page = (await browser.pages())[0]
   await page._client.send('Emulation.clearDeviceMetricsOverride')
   // login
@@ -194,11 +198,9 @@ const TASK = async (browser) => {
     await page.waitFor(500)
     await frame.evaluate(token => document.querySelector('input').value = token, token)
     await page.keyboard.press('\n')
-    await page.waitFor(2000)
+    await page.waitFor(5000)
   }
+  clearTimeout(exit_if_error_timeout)
 }
 
-(async () => {
-  let browser = await new_browser()
-  TASK(browser).catch((e) => {console.log(e)})
-})()
+new_browser().then(browser => TASK(browser).catch(() => process.exit(0)))
