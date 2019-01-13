@@ -16,8 +16,8 @@ args = dotdict({
   'arena_compare': 40,
   'cpuct': 1,
   'checkpoint': '../drive/temp/',
-  'load_model': False,
-  'load_folder_file': ('../drive/temp/', 'best.pth.tar'),
+  'load_model': True,
+  'load_folder_file': ('../drive/temp/', 'checkpoint_9.pth.tar'),
   'num_iters_for_train_examples_history': 20,
 })
 
