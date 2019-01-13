@@ -95,7 +95,7 @@ let command = async (page, cmd) => {
   await page.waitFor(500)
   await press(page.keyboard, cmd)
   await page.keyboard.press('\n')
-  await page.waitFor(500)
+  await page.waitFor(1000)
 }
 
 const TASK = async (browser) => {
@@ -133,10 +133,19 @@ const TASK = async (browser) => {
   }
   // Reset all runtimes
   await command(page, 'Reset all runtimes')
+  await page.waitFor(500)
   await page.keyboard.press('\n')
+  await page.waitFor(500)
   for(let code of CONF.google_drive_code) await add_code(page, code)
   await add_code(page, CONF.exec)
+  // Reset all runtimes
+  await command(page, 'Reset all runtimes')
+  await page.waitFor(500)
+  await page.keyboard.press('\n')
+  await page.waitFor(500)
+  // start
   await run_all_code(page.keyboard)
+  let temp_frame
   for(let i = 0; i<2; i++) {
     let frame
     let token_link
@@ -154,7 +163,9 @@ const TASK = async (browser) => {
           return false
         })
         if(!find_result) continue
-        frame      = v
+        if(i===1 && temp_frame===v) continue
+        frame = v
+        if(i===0) temp_frame = frame
         token_link = await frame.waitForSelector('pre a[target="_blank"]')
 
         finding_google_link = false
@@ -176,13 +187,12 @@ const TASK = async (browser) => {
     let token = await token_page.evaluate(() => document.querySelector('textarea').value)
     await page.waitFor(500)
     await token_page.close()
+    await page.waitFor(1000)
+    await frame.evaluate(() => document.querySelector('input').focus())
     await page.waitFor(500)
-    await frame.evaluate(() => document.querySelector('input.raw_input').focus())
-    await page.waitFor(500)
-    await frame.evaluate(token => document.querySelector('input.raw_input').value = token, token)
-    await page.waitFor(500)
+    await frame.evaluate(token => document.querySelector('input').value = token, token)
     await page.keyboard.press('\n')
-    await page.waitFor(500)
+    await page.waitFor(2000)
   }
   await command(page, 'Clear all outputs')
 }
