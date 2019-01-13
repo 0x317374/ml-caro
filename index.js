@@ -196,7 +196,6 @@ const TASK = async (browser) => {
     await page.keyboard.press('\n')
     await page.waitFor(2000)
   }
-  await command(page, 'Clear all outputs')
 }
 
 (async () => {
