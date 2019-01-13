@@ -98,6 +98,16 @@ let command = async (page, cmd) => {
   await page.waitFor(1000)
 }
 
+let reset_all_runtimes = async (page) => {
+  await command(page, 'Reset all runtimes')
+  await page.waitFor(500)
+  await page.keyboard.press('\n')
+  while(true) {
+    let status = await page.evaluate(() => document.querySelector('#connect').textContent.trim().toLowerCase())
+    if(status.indexOf('connected')!== -1) return
+  }
+}
+
 const TASK = async (browser) => {
   let page = (await browser.pages())[0]
   await page._client.send('Emulation.clearDeviceMetricsOverride')
@@ -131,18 +141,10 @@ const TASK = async (browser) => {
     await (await page.waitForSelector('#accelerators-menu paper-item[value="GPU"]')).click()
     await (await page.waitForSelector('#ok')).click()
   }
-  // Reset all runtimes
-  await command(page, 'Reset all runtimes')
-  await page.waitFor(500)
-  await page.keyboard.press('\n')
-  await page.waitFor(500)
   for(let code of CONF.google_drive_code) await add_code(page, code)
   await add_code(page, CONF.exec)
   // Reset all runtimes
-  await command(page, 'Reset all runtimes')
-  await page.waitFor(500)
-  await page.keyboard.press('\n')
-  await page.waitFor(500)
+  await reset_all_runtimes(page)
   // start
   await run_all_code(page.keyboard)
   let temp_frame
