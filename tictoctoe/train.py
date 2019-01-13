@@ -8,7 +8,7 @@ from tictoctoe.nnet_base import NNetWrapper as nn
 from board_game_base.utils import *
 
 temp_folder = "../drive/temp/"
-checkpoint_file = "checkpoint.pth.tar"
+checkpoint_file = "best.pth.tar"
 
 args = dotdict({
   "num_iters": 1000,
@@ -20,7 +20,7 @@ args = dotdict({
   "arena_compare": 40,
   "cpuct": 1,
   "checkpoint": temp_folder,
-  "load_model": os.path.isfile("{}{}".format(temp_folder, checkpoint_file)) and os.path.isfile("{}{}.examples".format(temp_folder, checkpoint_file)),
+  "load_model": os.path.isfile("{}{}".format(temp_folder, checkpoint_file)),
   "load_folder_file": (temp_folder, checkpoint_file),
   "num_iters_for_train_examples_history": 20,
 })
