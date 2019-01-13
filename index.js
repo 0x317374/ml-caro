@@ -25,7 +25,18 @@ vcode = getpass.getpass()
 !mkdir -p drive
 !google-drive-ocamlfuse drive
 `.trim()],
-  exec: '!ls',
+  exec: `
+!cp -a ./drive/mini-game/. ./
+!cd gobang6x4 && python train.py
+`.trim(),
+}
+
+let new_browser = () => {
+  return puppeteer.launch({
+    headless: false,
+    ignoreHTTPSErrors: true,
+    args: ['--disable-infobars', '--disable-infobars', '--window-size=1000,600', '--disable-features=site-per-process'],
+  })
 }
 
 let save_cookie = async (page) => {
@@ -87,13 +98,8 @@ let command = async (page, cmd) => {
   await page.waitFor(500)
 }
 
-const TASK = async () => {
-  let browser = await puppeteer.launch({
-    headless: false,
-    ignoreHTTPSErrors: true,
-    args: ['--disable-infobars', '--disable-infobars', '--window-size=1000,600', '--disable-features=site-per-process'],
-  })
-  let page    = (await browser.pages())[0]
+const TASK = async (browser) => {
+  let page = (await browser.pages())[0]
   await page._client.send('Emulation.clearDeviceMetricsOverride')
   // login
   if(!await load_cookie(page)) {
@@ -177,4 +183,7 @@ const TASK = async () => {
   await command(page, 'Clear all outputs')
 }
 
-TASK().catch((e) => {console.log(e)})
+(async () => {
+  let browser = await new_browser()
+  TASK(browser).catch((e) => {console.log(e)})
+})()
