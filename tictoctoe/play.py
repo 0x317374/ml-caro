@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append('..')
-from board_game_base.arena import Arena as arena
+from board_game_base.arena import Arena
 from board_game_base.mcts import MCTS
 from tictoctoe.game import TicTacToeGame, display
 from tictoctoe.players import *
@@ -20,7 +20,7 @@ g = TicTacToeGame()
 # all players
 # rp = RandomPlayer(g).play
 # gp = TicTacToeGame(g).play
-hp = RandomPlayer(g).play
+hp = HumanTicTacToePlayer(g).play
 
 # nnet players
 n1 = NNet(g)
@@ -36,5 +36,5 @@ n1p = lambda x: np.argmax(mcts1.get_action_prob(x, temp = 0))
 # n2p = lambda x: np.argmax(mcts2.get_action_prob(x, temp=0))
 
 # noinspection PyUnresolvedReferences
-arena = arena.Arena(n1p, hp, g, display = display)
+arena = Arena(n1p, hp, g, display = display)
 print(arena.play_games(2, verbose = True))
