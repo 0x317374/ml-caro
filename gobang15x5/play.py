@@ -3,9 +3,9 @@ import sys
 sys.path.append('..')
 from board_game_base.arena import Arena
 from board_game_base.mcts import MCTS
-from tictoctoe.game import TicTacToeGame, display
-from tictoctoe.players import *
-from tictoctoe.nnet_base import NNetWrapper as NNet
+from gobang15x5.game import GobangGame, display
+from gobang15x5.players import *
+from gobang15x5.nnet_base import NNetWrapper as NNet
 
 import numpy as np
 from board_game_base.utils import *
@@ -15,12 +15,11 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-g = TicTacToeGame()
+g = GobangGame()
 
 # all players
 # rp = RandomPlayer(g).play
-# gp = TicTacToeGame(g).play
-hp = HumanTicTacToePlayer(g).play
+hp = HumanGobangPlayer(g).play
 
 # nnet players
 n1 = NNet(g)

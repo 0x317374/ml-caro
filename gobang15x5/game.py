@@ -3,24 +3,15 @@ import sys
 
 sys.path.append('..')
 from board_game_base.game import Game
-from tictoctoe.logic import Board
+from .logic import Board
 import numpy as np
 
-"""
-Game class implementation for the game of TicTacToe.
-Based on the OthelloGame then get_game_ended() was adapted to new rules.
 
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
-
-Based on the OthelloGame by Surag Nair.
-"""
-
-
-class TicTacToeGame(Game):
-  def __init__(self, n = 3):
-    super().__init__()
+class GobangGame(Game):
+  # noinspection PyMissingConstructor
+  def __init__(self, n = 15, nir = 5):
     self.n = n
+    self.n_in_row = nir
 
   def get_init_board(self):
     # return initial board (numpy board)
@@ -46,6 +37,7 @@ class TicTacToeGame(Game):
     b.execute_move(move, player)
     return b.pieces, -player
 
+  # modified
   def get_valid_moves(self, board, player):
     # return a fixed size binary vector
     valids = [0]*self.get_action_size()
@@ -59,25 +51,36 @@ class TicTacToeGame(Game):
       valids[self.n*x+y] = 1
     return np.array(valids)
 
+  # modified
   def get_game_ended(self, board, player):
     # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
     # player = 1
     b = Board(self.n)
     b.pieces = np.copy(board)
-
-    if b.is_win(player):
-      return 1
-    if b.is_win(-player):
-      return -1
+    n = self.n_in_row
+    for w in range(self.n):
+      for h in range(self.n):
+        if (w in range(self.n-n+1) and board[w][h]!=0 and
+            len(set(board[i][h] for i in range(w, w+n)))==1):
+          return board[w][h]
+        if (h in range(self.n-n+1) and board[w][h]!=0 and
+            len(set(board[w][j] for j in range(h, h+n)))==1):
+          return board[w][h]
+        if (w in range(self.n-n+1) and h in range(self.n-n+1) and board[w][h]!=0 and
+            len(set(board[w+k][h+k] for k in range(n)))==1):
+          return board[w][h]
+        if (w in range(self.n-n+1) and h in range(n-1, self.n) and board[w][h]!=0 and
+            len(set(board[w+l][h-l] for l in range(n)))==1):
+          return board[w][h]
     if b.has_legal_moves():
       return 0
-    # draw has a very little value
     return 1e-4
 
   def get_canonical_form(self, board, player):
     # return state if player==1, else return -state if player==-1
     return player*board
 
+  # modified
   def get_symmetries(self, board, pi):
     # mirror, rotational
     assert (len(pi)==self.n**2+1)  # 1 for pass
@@ -100,27 +103,23 @@ class TicTacToeGame(Game):
 
 def display(board):
   n = board.shape[0]
-  print("   ", end = "")
   for y in range(n):
-    print(y, "", end = "")
+    print(y, "|", end = "")
   print("")
-  print("  ", end = "")
-  for _ in range(n):
-    print("-", end = "-")
-  print("--")
+  print(" -----------------------")
   for y in range(n):
     print(y, "|", end = "")  # print the row #
     for x in range(n):
       piece = board[y][x]  # get the piece to print
-      if piece==-1: print("X ", end = "")
-      elif piece==1: print("O ", end = "")
+      if piece==-1:
+        print("b ", end = "")
+      elif piece==1:
+        print("W ", end = "")
       else:
         if x==n:
           print("-", end = "")
         else:
           print("- ", end = "")
     print("|")
-  print("  ", end = "")
-  for _ in range(n):
-    print("-", end = "-")
-  print("--")
+
+  print("   -----------------------")

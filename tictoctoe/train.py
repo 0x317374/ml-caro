@@ -7,7 +7,7 @@ from tictoctoe.game import TicTacToeGame as Game
 from tictoctoe.nnet_base import NNetWrapper as nn
 from board_game_base.utils import *
 
-temp_folder = "../drive/temp/"
+temp_folder = "../drive/temp/tictoctoe/"
 checkpoint_file = "best.pth.tar"
 
 args = dotdict({

@@ -2,35 +2,28 @@ import os
 import sys
 
 import numpy as np
+import tensorflow as tf
 
 sys.path.append('..')
 from board_game_base.utils import *
 from board_game_base.neural_net import NeuralNet
 
-from tictoctoe.nnet import TicTacToeNNet as onnet
-
-"""
-NeuralNet wrapper class for the TicTacToeNNet.
-
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
-
-Based on (copy-pasted from) the NNet by SourKream and Surag Nair.
-"""
+from gobang15x5.nnet import GobangNNet as onnet
 
 args = dotdict({
-  'lr': 0.001,
-  'dropout': 0.3,
-  'epochs': 10,
-  'batch_size': 64,
-  'cuda': False,
-  'num_channels': 512,
+  "lr": 0.001,
+  "dropout": 0.3,
+  "epochs": 10,
+  "batch_size": 64,
+  "cuda": False,
+  "num_channels": 512,
 })
 
 
 class NNetWrapper(NeuralNet):
   # noinspection PyMissingConstructor
   def __init__(self, game):
+    self.graph = tf.get_default_graph()
     self.nnet = onnet(game, args)
     self.board_x, self.board_y = game.get_board_size()
     self.action_size = game.get_action_size()
@@ -51,10 +44,13 @@ class NNetWrapper(NeuralNet):
     """
     # timing
     # start = time.time()
+
     # preparing input
     board = board[np.newaxis, :, :]
-    # run
-    pi, v = self.nnet.model.predict(board)
+    with self.graph.as_default():
+      # run
+      self.nnet.model._make_predict_function()
+      pi, v = self.nnet.model.predict(board)
     # print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
     return pi[0], v[0]
 
@@ -64,12 +60,12 @@ class NNetWrapper(NeuralNet):
       print("Checkpoint Directory does not exist! Making directory {}".format(folder))
       os.mkdir(folder)
     else:
-      print("Checkpoint Directory exists!")
+      print("Checkpoint Directory exists! ")
     self.nnet.model.save_weights(filepath)
 
   def load_checkpoint(self, folder = 'checkpoint', filename = 'checkpoint.pth.tar'):
     # https://github.com/pytorch/examples/blob/master/imagenet/main.py#L98
     filepath = os.path.join(folder, filename)
     if not os.path.exists(filepath):
-      raise ("No model in path '{}'".format(filepath))
+      raise ("No model in path {}".format(filepath))
     self.nnet.model.load_weights(filepath)

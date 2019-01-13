@@ -3,11 +3,11 @@ import os
 
 sys.path.append('..')
 from board_game_base.coach import Coach
-from tictoctoe.game import TicTacToeGame as Game
-from tictoctoe.nnet_base import NNetWrapper as nn
+from gobang15x5.game import GobangGame as Game
+from gobang15x5.nnet_base import NNetWrapper as nn
 from board_game_base.utils import *
 
-temp_folder = "../drive/temp/"
+temp_folder = "../drive/temp/gobang15x5/"
 checkpoint_file = "best.pth.tar"
 
 args = dotdict({
