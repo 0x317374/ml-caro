@@ -4,7 +4,7 @@ const fs        = require('fs-extra')
 fs.ensureDirSync('./cookies')
 
 const CONF = {
-  email: 'dtc145d4801030100@ictu.edu.vn',
+  email: 'onggiachongchong@gmail.com',
   password: '',
   gpu: true,
   google_drive_code: [`
