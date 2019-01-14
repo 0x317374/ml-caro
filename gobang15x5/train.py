@@ -15,7 +15,7 @@ args = dotdict({
   "num_eps": 100,
   "temp_threshold": 15,
   "update_threshold": 0.6,
-  "maxlen_of_queue": 200000,
+  "maxlen_of_queue": 1000000,
   "num_MCTS_sims": 25,
   "arena_compare": 40,
   "cpuct": 1,
