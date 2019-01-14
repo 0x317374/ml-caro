@@ -111,9 +111,12 @@ let reset_all_runtimes = async (page) => {
 }
 
 const TASK = async (browser) => {
-  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 5)
+  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 3)
 
   let page = (await browser.pages())[0]
+  page.on('dialog', async dialog => {
+    await dialog.accept()
+  })
   await page._client.send('Emulation.clearDeviceMetricsOverride')
   // login
   if(!await load_cookie(page)) {
@@ -201,6 +204,16 @@ const TASK = async (browser) => {
     await page.waitFor(5000)
   }
   clearTimeout(exit_if_error_timeout)
+  let sleep = t => new Promise(r => setTimeout(r, t))
+  await sleep(10000)
+  // noinspection InfiniteLoopJS
+  while(true) {
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await sleep(30000)
+    let status = await page.evaluate(() => document.querySelector('#connect').textContent.trim().toLowerCase())
+    if(status.indexOf('busy')!== -1) continue
+    process.exit(0)
+  }
 }
 
 new_browser().then(browser => TASK(browser).catch(() => process.exit(0)))
