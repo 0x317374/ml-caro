@@ -4,8 +4,8 @@ const fs        = require('fs-extra')
 fs.ensureDirSync('./cookies')
 
 const CONF = {
-  email: 'onggiachongchong@gmail.com',
-  password: '',
+  email: 'dtc145d4801030100@ictu.edu.vn',
+  password: '@Cmx720119',
   gpu: true,
   google_drive_code: [`
 !apt-get install -y -qq software-properties-common module-init-tools
@@ -28,8 +28,7 @@ vcode = getpass.getpass()
 !google-drive-ocamlfuse drive
 `.trim()],
   exec: `
-!cp -a ./drive/mini-game/. ./
-!cd gobang6x4 && python train.py
+!ls
 `.trim(),
 }
 
@@ -111,8 +110,6 @@ let reset_all_runtimes = async (page) => {
 }
 
 const TASK = async (browser) => {
-  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 3)
-
   let page = (await browser.pages())[0]
   page.on('dialog', async dialog => {
     await dialog.accept()
@@ -154,6 +151,8 @@ const TASK = async (browser) => {
   await reset_all_runtimes(page)
   // start
   await run_all_code(page.keyboard)
+  // google drive
+  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 3)
   let temp_frame
   for(let i = 0; i<2; i++) {
     let frame
