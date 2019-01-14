@@ -209,7 +209,7 @@ const TASK = async (browser) => {
   // noinspection InfiniteLoopJS
   while(true) {
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await sleep(30000)
+    await sleep(60000)
     let status = await page.evaluate(() => document.querySelector('#connect').textContent.trim().toLowerCase())
     if(status.indexOf('busy')!== -1) continue
     process.exit(0)
