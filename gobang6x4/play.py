@@ -19,11 +19,12 @@ g = GobangGame()
 
 # all players
 # rp = RandomPlayer(g).play
+# gp = GreedyGobangPlayer(g).play
 hp = HumanGobangPlayer(g).play
 
 # nnet players
 n1 = NNet(g)
-n1.load_checkpoint('../drive/temp/', 'best.pth.tar')
+n1.load_checkpoint('../drive/temp/gobang6x4/', 'best.pth.tar')
 args1 = dotdict({ 'num_MCTS_sims': 50, 'cpuct': 1.0 })
 mcts1 = MCTS(g, n1, args1)
 n1p = lambda x: np.argmax(mcts1.get_action_prob(x, temp = 0))
