@@ -5,7 +5,7 @@ fs.ensureDirSync('./cookies')
 
 const CONF = {
   email: 'dtc145d4801030100@ictu.edu.vn',
-  password: '@Cmx720119',
+  password: '',
   gpu: true,
   google_drive_code: [`
 !apt-get install -y -qq software-properties-common module-init-tools
@@ -28,7 +28,8 @@ vcode = getpass.getpass()
 !google-drive-ocamlfuse drive
 `.trim()],
   exec: `
-!ls
+!cp -a ./drive/mini-game/. ./
+!cd gobang15x5 && python train.py
 `.trim(),
 }
 
@@ -215,4 +216,7 @@ const TASK = async (browser) => {
   }
 }
 
-new_browser().then(browser => TASK(browser).catch(() => process.exit(0)))
+new_browser().then(browser => TASK(browser).catch((e) => {
+  console.log(e)
+  process.exit(0)
+}))
