@@ -31,6 +31,26 @@
 
 !mkdir projects
 
+### Auto start training
+
+- Open file `halucaro-ai-train.bat`
+
+- Edit project folder path at line 3
+
+- Edit Anaconda activate script path at line 4
+
+- Create a shortcut file of `halucaro-ai-train.bat` and move it to `shell:startup`
+
+### Auto backup script
+
+- Open file `halucaro-models-backup.bat`
+
+- Edit `backup.exe` file path at line 3
+
+- Edit models folder path at line 3
+
+- Create a shortcut file of `halucaro-models-backup.bat` and move it to `shell:startup`
+
 ### Play game
 
 - `python human_play.py`
