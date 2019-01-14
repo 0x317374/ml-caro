@@ -153,7 +153,7 @@ const TASK = async (browser) => {
   // start
   await run_all_code(page.keyboard)
   // google drive
-  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 3)
+  let exit_if_error_timeout = setTimeout(() => process.exit(0), 60000 * 5)
   let temp_frame
   for(let i = 0; i<2; i++) {
     let frame
