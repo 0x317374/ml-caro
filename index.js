@@ -29,7 +29,7 @@ vcode = getpass.getpass()
 `.trim()],
   exec: `
 !cp -a ./drive/mini-game/. ./
-!cd gobang15x5 && python train.py
+!cd gobang6x4 && python train.py
 `.trim(),
 }
 
