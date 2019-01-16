@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const modelsDir = path.normalize(process.argv[2]);
-const serverUrl = process.argv[3];
+const serverUrl = process.argv[3].trim()
 
 const wait = time => new Promise(rel => setTimeout(rel, time));
 
@@ -15,7 +15,7 @@ const backup = () => {
   fs.readdir(modelsDir, async (error, files) => {
     if (error) return console.log(error);
     
-    const modelFiles = files.filter(file => file.startsWith('keras') && file.endsWith('.model'));
+    const modelFiles = files.filter(file => file.startsWith('keras_best') && file.endsWith('.model') || file === 'keras_current_15x15_5.model');
     
     while (modelFiles.length > 0) {
       const file = modelFiles.shift();
@@ -40,6 +40,6 @@ const backup = () => {
   });
 };
 
-const id = setInterval(backup, 1000*60*15); // do backup each 15mins
+const id = setInterval(backup, 1000*60*20); // do backup each 20mins
 
 backup();
