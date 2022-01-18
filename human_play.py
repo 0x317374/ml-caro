@@ -4,7 +4,7 @@ from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
 from const import Const
-from policy_value_net_pytorch import PolicyValueNet
+from policy_value_net_keras import PolicyValueNet
 
 
 class Human(object):
@@ -38,6 +38,7 @@ def run():
   try:
     board = Board(width = width, height = height, n_in_row = n)
     game = Game(board)
+    # load the trained policy_value_net in either Theano/Lasagne, PyTorch or TensorFlow
     best_policy = PolicyValueNet(width, height, model_file = model_file)
     mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct = 5, n_playout = 400)
     # human player, input your move in the format: 2,3
